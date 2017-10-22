@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}{% if session['university'] %} {{ session['university'] }} {% else %} CSUSB {% endif %} Survivor &ndash; Take Photo{% endblock %}
+
+{% block page_content %}
+<div class="container text-center">
+<h2>Take Your Photo</h2>
+<p class="lead">All of your team members will be able to see your picture.
+Your picture will be used until you are finished playing the game.</p>
+
+{% for message in get_flashed_messages() %}
+<div class="alert alert-warning alert-dismissible" role="alert">
+{{ message }}
+</div>
+
+{% endfor %}
+
+<div class="panel panel-default">
+  <div class="panel-heading"><strong>Upload Files</strong> <small></small></div>
+  <div class="panel-body">
+
+    <!-- Standar Form -->
+    <h4>Select files from your computer</h4>
+    <form action="" method="post" enctype="multipart/form-data" id="js-upload-form">
+      <div class="form-inline">
+        <div class="form-group">
+          <input type="file" name="file" id="js-upload-files" multiple>
+        </div>
+        <button type="submit" class="btn btn-sm btn-primary" id="js-upload-submit">Upload files modified</button>
+      </div>
+    </form>
+  </div>
+<!-- </div>
+    <a class="btn btn-primary" href="{{ url_for('main.staging') }}" id="submit_photo">Skip Photo</a>
+</div> -->
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+
+{% endblock %}
