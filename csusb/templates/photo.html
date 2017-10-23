@@ -15,24 +15,112 @@ Your picture will be used until you are finished playing the game.</p>
 
 {% endfor %}
 
-<div class="panel panel-default">
-  <div class="panel-heading"><strong>Upload Files</strong> <small></small></div>
-  <div class="panel-body">
 
-    <!-- Standar Form -->
-    <h4>Select files from your computer</h4>
-    <form action="" method="post" enctype="multipart/form-data" id="js-upload-form">
-      <div class="form-inline">
-        <div class="form-group">
-          <input type="file" name="file" id="js-upload-files" multiple>
-        </div>
-        <button type="submit" class="btn btn-sm btn-primary" id="js-upload-submit">Upload files modified</button>
-      </div>
-    </form>
-  </div>
-<!-- </div>
-    <a class="btn btn-primary" href="{{ url_for('main.staging') }}" id="submit_photo">Skip Photo</a>
-</div> -->
+<!DOCTYPE html>
+<html>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script> 
+
+<head>
+</head>
+
+<body onload="init();">
+  
+  <p>
+    <button onclick="startWebcam();">Start WebCam</button>
+    <button type="submit" id="dl-btn" href="#" download="participant.jpeg" onclick="snapshot();">Take Snapshot</button>
+  </p>
+  <video onclick="snapshot();" width=400 height=400 id="video" controls autoplay></video>
+  <p>
+
+    Screenshots :
+    <p>
+      <canvas id="myCanvas" width="400" height="350"></canvas>
+    </p>
+    <script>
+      //--------------------
+      // GET USER MEDIA CODE
+      //--------------------
+
+
+      var video;
+      var webcamStream;
+
+      function startWebcam() {
+        if (navigator.mediaDevices.getUserMedia) {
+          navigator.mediaDevices.getUserMedia(
+
+              // constraints
+              {
+                video: true,
+                audio: false
+              }).then(
+
+              // successCallback
+              function(localMediaStream) {
+                console.log(webcamStream);
+                video.src = window.URL.createObjectURL(localMediaStream);
+                webcamStream = localMediaStream;
+              })
+            .catch(
+              // errorCallback
+              function(err) {
+                console.log("The following error occured: " + err);
+              })
+        
+      } else {
+        console.log("getUserMedia not supported");
+      }
+      }
+
+
+      //---------------------
+      // TAKE A SNAPSHOT CODE
+      //---------------------
+      var canvas, ctx;
+
+      function init() {
+        video = document.querySelector('video');
+        // Get the canvas and obtain a context for
+        // drawing in it
+        canvas = document.getElementById("myCanvas");
+        context = canvas.getContext('2d');
+      }
+
+      function snapshot() {
+        // Draws current image from the video element into the canvas
+        console.log(webcamStream);
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        webcamStream.getTracks().forEach(function(track) {
+          track.stop();
+        });
+        var dataURL = canvas.toDataURL('image/jpeg', 1.0);
+        document.querySelector('#dl-btn').href = dataURL;
+
+        console.log(dataURL);
+         $.ajax({
+          type: "POST",
+          contentType: false,
+          cache: false,
+          processData: false,
+          async: false,
+          url: "/upload",
+          data: { 
+            imgBase64: dataURL
+          }
+        }).done(function(o) {
+          console.log('saved'); 
+  // If you want the file to be visible in the browser 
+  // - please modify the callback in javascript. All you
+  // need is to return the url to the file, you just saved 
+  // and than put the image in your browser.
+});
+
+      }
+    </script>
+</body>
+
+</html>
+
 
 {% endblock %}
 
