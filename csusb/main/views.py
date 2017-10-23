@@ -12,8 +12,7 @@ import random
 from itertools import groupby
 import csv
 import StringIO
-from base64 import decodestring, urlsafe_b64encode
-from hashlib import sha256
+from base64 import decodestring
 
 from datetime import datetime
 
