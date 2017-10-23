@@ -12,6 +12,8 @@ import random
 from itertools import groupby
 import csv
 import StringIO
+from base64 import decodestring, urlsafe_b64encode
+from hashlib import sha256
 
 from datetime import datetime
 
@@ -97,29 +99,20 @@ def participant():
 
 @main.route('/photo', methods=['GET', 'POST'])
 def photo():
-    def allowed_file(filename):
-        return '.' in filename and filename.rsplit('.', 1)[1] in config['default'].ALLOWED_EXTENSIONS
     if request.method == 'POST':
         # check if the post request has the file part
-        print request.files
-        if 'file' not in request.files:
+        if 'imgBase64' not in request.form:
             flash('No file part')
             return redirect(request.url)
-        file = request.files['file']
-        # if user does not select file, browser also
-        # submit a empty part without filename
-        if file.filename == '':
-            flash('No selected file')
-            return redirect(request.url)
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            path_to_photo = os.path.join(config['default'].UPLOAD_FOLDER, filename)
-            file.save(path_to_photo)
-            participant = Participant.query.filter_by(id=session['participant_id']).first()
-            participant.photo = filename
-            db.session.commit()
-            return redirect('/staging')
-
+        data_uri = request.form['imgBase64']
+        data = decodestring(data_uri.split(',', 1)[-1])
+        filename = urlsafe_b64encode(sha256(data).digest()).rstrip("=")
+        path_to_photo = os.path.join(config['default'].UPLOAD_FOLDER, filename)
+        with open(path_to_photo + '.jpeg', 'wb') as f:
+            f.write(data)
+        participant = Participant.query.filter_by(id=session['participant_id']).first()
+        participant.photo = filename
+        db.session.commit()
         return redirect('/staging')
     return render_template('photo.html')
 
