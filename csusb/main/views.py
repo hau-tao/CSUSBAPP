@@ -106,11 +106,11 @@ def photo():
             return redirect(request.url)
         data_uri = request.form['imgBase64']
         data = decodestring(data_uri.split(',', 1)[-1])
-        filename = urlsafe_b64encode(sha256(data).digest()).rstrip("=")
-        path_to_photo = os.path.join(config['default'].UPLOAD_FOLDER, filename)
-        with open(path_to_photo + '.jpeg', 'wb') as f:
-            f.write(data)
         participant = Participant.query.filter_by(id=session['participant_id']).first()
+        filename = participant.first_name + '_' + participant.last_name + '.jpg'
+        path_to_photo = os.path.join(config['default'].UPLOAD_FOLDER, filename)
+        with open(path_to_photo, 'wb') as f:
+            f.write(data)
         participant.photo = filename
         db.session.commit()
         return redirect('/staging')
