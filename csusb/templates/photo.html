@@ -104,6 +104,9 @@ Your picture will be used until you are finished playing the game.</p>
           url: "/photo",
           data: { 
             imgBase64: dataURL
+          },
+          success: function(data, status) {
+              window.location.href = '/staging';
           }
         }).done(function(o) {
           console.log('saved'); 
