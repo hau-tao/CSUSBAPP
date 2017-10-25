@@ -106,7 +106,7 @@ def photo():
         data_uri = request.form['imgBase64']
         data = decodestring(data_uri.split(',', 1)[-1])
         participant = Participant.query.filter_by(id=session['participant_id']).first()
-        filename = participant.first_name + '_' + participant.last_name + '.jpg'
+        filename = "{0}_{1}_{2}.jpg".format(participant.first_name, participant.last_name, session['participant_id'])
         path_to_photo = os.path.join(config['default'].UPLOAD_FOLDER, filename)
         with open(path_to_photo, 'wb') as f:
             f.write(data)
